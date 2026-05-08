@@ -120,3 +120,11 @@ export type CurrencyCode = keyof typeof CURRENCIES
 export type CurrencyMeta = (typeof CURRENCIES)[CurrencyCode]
 
 export const TOP_CURRENCY_CODES = Object.keys(CURRENCIES) as CurrencyCode[]
+
+// Top 30 most-traded currencies — used for static page generation at build time.
+// All other pairs are rendered on-demand (dynamicParams = true).
+export const STATIC_CURRENCY_CODES: CurrencyCode[] = [
+  'USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'NZD',
+  'SEK', 'KRW', 'SGD', 'NOK', 'MXN', 'INR', 'TRY', 'BRL', 'TWD', 'PLN',
+  'THB', 'IDR', 'HUF', 'CZK', 'ILS', 'AED', 'SAR', 'MYR', 'PHP', 'ZAR',
+]

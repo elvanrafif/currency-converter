@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { CURRENCIES, TOP_CURRENCY_CODES } from '@/lib/currencies'
+import { CURRENCIES, TOP_CURRENCY_CODES, STATIC_CURRENCY_CODES } from '@/lib/currencies'
 import { getAllRates, computeRate } from '@/lib/exchange-rate'
 import { parsePair, formatNumber } from '@/lib/utils'
 import CurrencyCalculator from '@/components/CurrencyCalculator'
@@ -10,8 +10,8 @@ export const dynamicParams = true
 
 export async function generateStaticParams() {
   const pairs: { pair: string }[] = []
-  for (const from of TOP_CURRENCY_CODES) {
-    for (const to of TOP_CURRENCY_CODES) {
+  for (const from of STATIC_CURRENCY_CODES) {
+    for (const to of STATIC_CURRENCY_CODES) {
       if (from !== to) {
         pairs.push({ pair: `${from.toLowerCase()}-to-${to.toLowerCase()}` })
       }
@@ -285,7 +285,7 @@ export default async function ConvertPage({
           <div className="max-w-2xl mx-auto flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm font-extrabold text-amber">kurs.</span>
             <p className="text-xs text-ink-3">
-              Live exchange rates · Updated hourly · 160+ currencies
+              Live exchange rates · Updated hourly · 100+ currencies
             </p>
           </div>
         </footer>
