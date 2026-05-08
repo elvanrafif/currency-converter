@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       if (from !== to) {
         pairs.push({
           url: `https://transfez.com/convert/${from.toLowerCase()}-to-${to.toLowerCase()}`,
-          lastModified: new Date(),
+          lastModified: new Date('2026-01-01'),
           changeFrequency: 'hourly',
           priority: 0.8,
         })

@@ -26,7 +26,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { pair } = await params
   const parsed = parsePair(pair)
-  if (!parsed) return {}
+  if (!parsed) return { robots: { index: false } }
 
   const { from, to } = parsed
   const fromMeta = CURRENCIES[from as keyof typeof CURRENCIES]
