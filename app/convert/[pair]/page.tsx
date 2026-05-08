@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { CURRENCIES, TOP_CURRENCY_CODES } from '@/lib/currencies'
 import { getAllRates, computeRate } from '@/lib/exchange-rate'
 import { parsePair, formatNumber } from '@/lib/utils'
@@ -93,6 +94,8 @@ export default async function ConvertPage({
     description: `Convert ${from} to ${to} with live exchange rates updated every hour.`,
   }
 
+  const rateFormatted = formatNumber(rate, rate < 0.01 ? 6 : 4)
+
   return (
     <>
       <script
@@ -100,104 +103,192 @@ export default async function ConvertPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main className="min-h-screen bg-gray-50">
-        <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
+      <main className="flex flex-col flex-1 bg-surface">
+        {/* ── Nav ───────────────────────────────────────────────── */}
+        <nav
+          className="px-6 py-4 flex items-center justify-between border-b"
+          style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface-up)' }}
+        >
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-sm font-semibold transition-colors"
+            style={{ color: 'var(--ink-2)' }}
+          >
+            <span aria-hidden>←</span>
+            <span>All currencies</span>
+          </Link>
+          <span className="text-sm font-extrabold text-amber">kurs.</span>
+        </nav>
 
-          {/* Header */}
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900">
-              {fromFlag} {fromName} to {toFlag} {toName}
-            </h1>
-            <p className="text-gray-500 text-sm">
-              {from} to {to} Converter — rates updated hourly
+        <div className="max-w-2xl mx-auto w-full px-6 py-10 space-y-10">
+
+          {/* ── Rate hero ─────────────────────────────────────────── */}
+          <section>
+            <p
+              className="text-xs font-semibold uppercase tracking-widest mb-4"
+              style={{ color: 'var(--ink-3)' }}
+            >
+              {fromFlag} {fromName} → {toFlag} {toName}
             </p>
-          </div>
 
-          {/* Live rate badge */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-4 text-center">
-            <p className="text-2xl font-semibold text-gray-800">
+            <h1
+              className="text-4xl font-extrabold tracking-tight leading-tight mb-1 md:text-5xl"
+              style={{ color: 'var(--ink)' }}
+            >
               1 {from} ={' '}
-              <span className="text-blue-600">
-                {formatNumber(rate, rate < 0.01 ? 6 : 4)} {to}
+              <span className="text-amber">{rateFormatted}</span>{' '}
+              {to}
+            </h1>
+
+            <p className="text-sm" style={{ color: 'var(--ink-3)' }}>
+              {fromSymbol}1 {fromName} = {toSymbol}{rateFormatted} {toName}
+              <span
+                className="inline-block ml-3 text-[10px] font-semibold uppercase tracking-widest"
+                style={{ color: 'var(--amber)' }}
+              >
+                · Updated hourly
               </span>
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              {fromSymbol}1 {fromName} = {toSymbol}{formatNumber(rate, rate < 0.01 ? 6 : 4)} {toName}
+          </section>
+
+          {/* ── Interactive calculator ─────────────────────────────── */}
+          <section
+            className="rounded-2xl p-6"
+            style={{
+              backgroundColor: 'var(--surface-up)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            <p
+              className="text-[10px] font-semibold uppercase tracking-widest mb-4"
+              style={{ color: 'var(--ink-3)' }}
+            >
+              Calculator
             </p>
-          </div>
+            <CurrencyCalculator
+              from={from}
+              to={to}
+              initialRate={rate}
+              fromName={fromName}
+              toName={toName}
+              fromSymbol={fromSymbol}
+              toSymbol={toSymbol}
+              fromFlag={fromFlag}
+              toFlag={toFlag}
+            />
+          </section>
 
-          {/* Interactive calculator */}
-          <CurrencyCalculator
-            from={from}
-            to={to}
-            initialRate={rate}
-            fromName={fromName}
-            toName={toName}
-            fromSymbol={fromSymbol}
-            toSymbol={toSymbol}
-            fromFlag={fromFlag}
-            toFlag={toFlag}
-          />
-
-          {/* Conversion table */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-800">
-                {from} to {to} Conversion Table
-              </h2>
-            </div>
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="text-left px-6 py-3 text-gray-500 font-medium">
-                    {fromFlag} {from}
-                  </th>
-                  <th className="text-left px-6 py-3 text-gray-500 font-medium">
-                    {toFlag} {to}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {conversionTable.map(({ amount, result }) => (
-                  <tr key={amount} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-3 text-gray-700">
-                      {fromSymbol}{formatNumber(amount, 0)}
-                    </td>
-                    <td className="px-6 py-3 text-gray-900 font-medium">
-                      {toSymbol}{formatNumber(result, result < 1 ? 4 : 2)}
-                    </td>
+          {/* ── Conversion table ───────────────────────────────────── */}
+          <section>
+            <h2
+              className="text-xs font-semibold uppercase tracking-widest mb-4"
+              style={{ color: 'var(--ink-3)' }}
+            >
+              {from} to {to} Conversion Table
+            </h2>
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{ border: '1px solid var(--border)' }}
+            >
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ backgroundColor: 'var(--surface-dn)' }}>
+                    <th
+                      className="text-left px-5 py-3 text-[10px] font-semibold uppercase tracking-widest"
+                      style={{ color: 'var(--ink-3)' }}
+                    >
+                      {fromFlag} {from}
+                    </th>
+                    <th
+                      className="text-left px-5 py-3 text-[10px] font-semibold uppercase tracking-widest"
+                      style={{ color: 'var(--ink-3)' }}
+                    >
+                      {toFlag} {to}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {conversionTable.map(({ amount, result: r }, i) => (
+                    <tr
+                      key={amount}
+                      style={{
+                        backgroundColor: i % 2 === 0 ? 'var(--surface-up)' : 'var(--surface)',
+                        borderTop: '1px solid var(--border)',
+                      }}
+                    >
+                      <td className="px-5 py-3 font-medium" style={{ color: 'var(--ink-2)' }}>
+                        {fromSymbol}{formatNumber(amount, 0)}
+                      </td>
+                      <td className="px-5 py-3 font-bold" style={{ color: 'var(--ink)' }}>
+                        {toSymbol}{formatNumber(r, r < 1 ? 4 : 2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
 
-          {/* Related conversions */}
-          <div className="space-y-3">
-            <h2 className="font-semibold text-gray-800 px-1">Related Conversions</h2>
-            <div className="grid grid-cols-2 gap-3">
+          {/* ── Related conversions ────────────────────────────────── */}
+          <section>
+            <h2
+              className="text-xs font-semibold uppercase tracking-widest mb-4"
+              style={{ color: 'var(--ink-3)' }}
+            >
+              Related conversions
+            </h2>
+            <div className="grid grid-cols-2 gap-2.5">
               {/* Reverse pair */}
-              <a
+              <Link
                 href={`/convert/${to.toLowerCase()}-to-${from.toLowerCase()}`}
-                className="bg-white rounded-xl border border-gray-100 px-4 py-3 text-sm text-gray-700 hover:border-blue-300 hover:shadow-sm transition-all flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-3.5 rounded-xl text-sm font-semibold transition-colors"
+                style={{
+                  backgroundColor: 'var(--surface-up)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--ink-2)',
+                }}
               >
                 <span>{toFlag}</span>
-                <span className="font-medium">{to} → {from}</span>
-              </a>
-              {relatedPairs.map(({ code, name, flag }) => (
-                <a
+                <span className="font-bold text-ink">{to}</span>
+                <span className="text-ink-3 text-xs">→</span>
+                <span className="font-bold text-ink">{from}</span>
+              </Link>
+
+              {relatedPairs.map(({ code, flag }) => (
+                <Link
                   key={code}
                   href={`/convert/${from.toLowerCase()}-to-${code.toLowerCase()}`}
-                  className="bg-white rounded-xl border border-gray-100 px-4 py-3 text-sm text-gray-700 hover:border-blue-300 hover:shadow-sm transition-all flex items-center gap-2"
+                  className="flex items-center gap-2 px-4 py-3.5 rounded-xl text-sm transition-colors"
+                  style={{
+                    backgroundColor: 'var(--surface-up)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink-2)',
+                  }}
                 >
-                  <span>{flag}</span>
-                  <span className="font-medium">{from} → {code}</span>
-                </a>
+                  <span>{fromFlag}</span>
+                  <span className="font-bold text-ink">{from}</span>
+                  <span className="text-ink-3 text-xs">→</span>
+                  <span className="font-bold text-ink">{code}</span>
+                  <span className="ml-auto">{flag}</span>
+                </Link>
               ))}
             </div>
-          </div>
+          </section>
 
         </div>
+
+        {/* ── Footer ────────────────────────────────────────────── */}
+        <footer
+          className="mt-auto px-6 py-7 border-t"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <div className="max-w-2xl mx-auto flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm font-extrabold text-amber">kurs.</span>
+            <p className="text-xs text-ink-3">
+              Live exchange rates · Updated hourly · 160+ currencies
+            </p>
+          </div>
+        </footer>
       </main>
     </>
   )

@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const barlow = Barlow({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-barlow",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Currency Converter — Live Exchange Rates',
-    template: '%s | Currency Converter',
+    default: "Currency Converter — Live Exchange Rates",
+    template: "%s | Currency Converter",
   },
-  description: 'Convert currencies with live exchange rates updated hourly. Fast, accurate currency conversion for 160+ currencies.',
+  description:
+    "Convert currencies with live exchange rates updated hourly. Fast, accurate currency conversion for 160+ currencies.",
 };
 
 export default function RootLayout({
@@ -26,10 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${barlow.variable} h-full`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

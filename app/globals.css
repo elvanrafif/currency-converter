@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink:        oklch(12% 0.012 50);
+  --ink-2:      oklch(38% 0.015 50);
+  --ink-3:      oklch(58% 0.010 50);
+  --surface:    oklch(97.5% 0.006 70);
+  --surface-up: oklch(99.5% 0.004 70);
+  --surface-dn: oklch(93% 0.009 70);
+  --amber:      oklch(70% 0.16 65);
+  --amber-dim:  oklch(65% 0.155 65);
+  --amber-pale: oklch(92% 0.05 68);
+  --border:     oklch(90% 0.007 70);
+  --border-md:  oklch(83% 0.010 70);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background: var(--surface);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-barlow);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ink:        var(--ink);
+  --color-ink-2:      var(--ink-2);
+  --color-ink-3:      var(--ink-3);
+  --color-surface:    var(--surface);
+  --color-surface-up: var(--surface-up);
+  --color-surface-dn: var(--surface-dn);
+  --color-amber:      var(--amber);
+  --color-amber-dim:  var(--amber-dim);
+  --color-amber-pale: var(--amber-pale);
+  --color-border:     var(--border);
+  --color-border-md:  var(--border-md);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-barlow), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
