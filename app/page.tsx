@@ -5,7 +5,7 @@ import HomepageCalculator from '@/components/HomepageCalculator'
 export const metadata: Metadata = {
   title: 'Currency Converter — Live Exchange Rates',
   description:
-    'Convert currencies with live exchange rates updated hourly. Supports 160+ currencies including USD, IDR, JPY, EUR, SGD, and more.',
+    'Convert currencies with live exchange rates updated hourly. Supports 100+ currencies including USD, IDR, JPY, EUR, SGD, and more.',
 }
 
 const POPULAR_PAIRS = [
@@ -45,7 +45,7 @@ export default function Home() {
               </h1>
               <p className="text-base font-light leading-relaxed" style={{ color: 'oklch(62% 0.008 50)' }}>
                 Live exchange rates, updated every hour.<br />
-                160+ currencies including USD, IDR, SGD, JPY.
+                100+ currencies including USD, IDR, SGD, JPY.
               </p>
             </div>
 
