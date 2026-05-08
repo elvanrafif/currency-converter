@@ -14,18 +14,31 @@ function CurrencyPicker({
   label: string
 }) {
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   const ref = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
   const meta = CURRENCIES[value as keyof typeof CURRENCIES]
+
+  const filtered = TOP_CURRENCY_CODES.filter((code) => {
+    const q = query.toLowerCase()
+    return code.toLowerCase().includes(q) || CURRENCIES[code].name.toLowerCase().includes(q)
+  })
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false)
+        setQuery('')
       }
     }
     document.addEventListener('mousedown', onClickOutside)
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [])
+
+  useEffect(() => {
+    if (open) setTimeout(() => searchRef.current?.focus(), 0)
+    else setQuery('')
+  }, [open])
 
   return (
     <div className="flex-1 space-y-1.5" ref={ref}>
@@ -53,35 +66,59 @@ function CurrencyPicker({
 
       {open && (
         <div
-          className="absolute z-50 rounded-xl overflow-y-auto shadow-lg"
+          className="absolute z-50 rounded-xl shadow-lg flex flex-col"
           style={{
-            maxHeight: '150px',
-            minWidth: '140px',
+            width: '180px',
             backgroundColor: 'var(--surface-up)',
             border: '1.5px solid var(--border-md)',
           }}
         >
-          {TOP_CURRENCY_CODES.map((code) => {
-            const m = CURRENCIES[code]
-            const selected = code === value
-            return (
-              <button
-                key={code}
-                type="button"
-                onClick={() => { onChange(code); setOpen(false) }}
-                className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors"
-                style={{
-                  backgroundColor: selected ? 'var(--amber)' : 'transparent',
-                  color: selected ? 'var(--ink)' : 'var(--ink-2)',
-                  fontWeight: selected ? 700 : 400,
-                }}
-              >
-                <span>{m.flag}</span>
-                <span>{code}</span>
-                <span className="text-xs ml-auto truncate" style={{ color: selected ? 'var(--ink)' : 'var(--ink-3)', maxWidth: '60px' }}>{m.name.split(' ')[0]}</span>
-              </button>
-            )
-          })}
+          {/* Search — sticky */}
+          <div className="p-2" style={{ borderBottom: '1px solid var(--border)' }}>
+            <input
+              ref={searchRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search…"
+              className="w-full px-2.5 py-1.5 rounded-lg text-xs outline-none"
+              style={{
+                backgroundColor: 'var(--surface-dn)',
+                color: 'var(--ink)',
+                border: '1px solid var(--border-md)',
+              }}
+            />
+          </div>
+
+          {/* List */}
+          <div className="overflow-y-auto" style={{ maxHeight: '300px' }}>
+            {filtered.length === 0 && (
+              <p className="px-3 py-3 text-xs text-center" style={{ color: 'var(--ink-3)' }}>
+                No results
+              </p>
+            )}
+            {filtered.map((code) => {
+              const m = CURRENCIES[code]
+              const selected = code === value
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => { onChange(code); setOpen(false) }}
+                  className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors"
+                  style={{
+                    backgroundColor: selected ? 'var(--amber)' : 'transparent',
+                    color: selected ? 'var(--ink)' : 'var(--ink-2)',
+                    fontWeight: selected ? 700 : 400,
+                  }}
+                >
+                  <span>{m.flag}</span>
+                  <span>{code}</span>
+                  <span className="text-xs ml-auto truncate" style={{ color: selected ? 'var(--ink)' : 'var(--ink-3)', maxWidth: '60px' }}>{m.name.split(' ')[0]}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>
